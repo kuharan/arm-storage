@@ -1,0 +1,38 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Name": {
+            "type": "string"
+        },
+        "Kind": {
+            "type": "string",
+            "defaultValue": "Storage",
+            "allowedValues": [
+                "Storage",
+                "StorageV2",
+                "BlockBlobStorage",
+                "FileStorage"
+            ]
+        },
+        "Type": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS"
+            ]
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('Name')]",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-07-01",
+            "sku": {
+                "name": "[parameters('Type')]"
+            },
+            "kind": "[parameters('Kind')]"
+        }
+    ]
+}
