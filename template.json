@@ -2,37 +2,59 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "Name": {
-            "type": "string"
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the name of the Azure Storage account."
+            }
         },
-        "Kind": {
+        "location": {
+            "type": "string",
+            "defaultValue": " ",
+            "allowedValues": [
+                "Central US",
+                "East US",
+                "East US 2",
+                "North Central US",
+                "South Central US",
+                "West Central US",
+                "West US",
+                "West US 2"
+            ],
+            "metadata": {
+                "description": "Specifies the location in which the Azure Storage resources should be deployed."
+            }
+        },
+        "Accountkind": {
             "type": "string",
             "defaultValue": "Storage",
-            "allowedValues": [
-                "Storage",
-                "StorageV2",
-                "BlockBlobStorage",
-                "FileStorage"
-            ]
+            "allowedValues": ["Storage", "StorageV2", "BlobStorage", "BlockBlobStorage"],
+            "metadata": {
+                "description": "Specifies the kind of the Azure Storage resource."
+            }
         },
-        "Type": {
-            "type": "string",
+        "Replication": {
             "defaultValue": "Standard_LRS",
             "allowedValues": [
-                "Standard_LRS"
-            ]
+              "Standard_LRS",
+              "Standard_GRS",
+              "Standard_RAGRS",
+              "Standard_ZRS",
+              "Premium_LRS"
+            ],
+            "type": "string"
         }
     },
     "resources": [
         {
+            "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[parameters('Name')]",
-            "location": "[resourceGroup().location]",
             "apiVersion": "2018-07-01",
+            "location": "[parameters('location')]",
+            "kind": "[parameters('Accountkind')]",
             "sku": {
-                "name": "[parameters('Type')]"
-            },
-            "kind": "[parameters('Kind')]"
+                "name": "[parameters('Replication')]"
+            }
         }
     ]
 }
