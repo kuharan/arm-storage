@@ -2,58 +2,62 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "storageAccountName": {
-            "type": "string",
-            "metadata": {
-                "description": "Specifies the name of the Azure Storage account."
-            }
+        "Name": {
+            "type": "string"
         },
-        "location": {
-            "type": "string",
-            "defaultValue": " ",
-            "allowedValues": [
-                "Central US",
-                "East US",
-                "East US 2",
-                "North Central US",
-                "South Central US",
-                "West Central US",
-                "West US",
-                "West US 2"
-            ],
-            "metadata": {
-                "description": "Specifies the location in which the Azure Storage resources should be deployed."
-            }
-        },
-        "Accountkind": {
+		"Performance": {
+			"type": "string",
+			"defaultValue": "Standard",
+			"allowedValues": [
+				"Standard",
+				"Premium"
+			]
+		},
+		"Kind": {
             "type": "string",
             "defaultValue": "Storage",
-            "allowedValues": ["Storage", "StorageV2", "BlobStorage", "BlockBlobStorage"],
-            "metadata": {
-                "description": "Specifies the kind of the Azure Storage resource."
-            }
+            "allowedValues": [
+                "Storage",
+                "StorageV2",
+                "BlobStorage",
+				"BlockBlobStorage",
+				"FileStorage"
+            ]
         },
         "Replication": {
+            "type": "string",
             "defaultValue": "Standard_LRS",
             "allowedValues": [
-              "Standard_LRS",
-              "Standard_GRS",
-              "Standard_RAGRS",
-              "Standard_ZRS",
-              "Premium_LRS"
-            ],
-            "type": "string"
+                "_LRS",
+                "_GRS",
+                "_ZRS",
+                "_RAGRS"
+            ]
+        },
+        "AccessTier": {
+            "type": "string",
+            "defaultValue": "Hot",
+            "allowedValues": [
+                "Cool",
+                "Hot"
+            ]
         }
     },
+	"variables": {
+		"Type": "[concat(parameters('Performance'), parameters('Replication'))]"
+	},
     "resources": [
         {
-            "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('Name')]",
+            "location": "[resourceGroup().location]",
             "apiVersion": "2018-07-01",
-            "location": "[parameters('location')]",
-            "kind": "[parameters('Accountkind')]",
             "sku": {
-                "name": "[parameters('Replication')]"
+                "name": "[if(equals(parameters('Performance'), 'Standard'), if(or(equals(parameters('Kind'),'Storage'), equals(parameters('Kind'),'BlobStorage'), equals(parameters('Kind'), 'BlockBlobStorage'), equals(parameters('Kind'),'FileStorage')), if(equals(variables('Type'), 'Standard_ZRS'), 'Standard_LRS', variables('Type')), variables('Type')), 'Premium_LRS')]"
+            },
+            "kind": "[if(equals(parameters('Performance'), 'Standard'), if(or(equals(parameters('Kind'), 'BlockBlobStorage'), equals(parameters('Kind'), 'FileStorage')), 'BlobStorage', parameters('Kind')), if(equals(parameters('Kind'),'BlobStorage'), 'BlockBlobStorage' , parameters('Kind')))]",
+            "properties": {
+                "accessTier": "[if(equals(parameters('Performance'), 'Standard'), if(equals(parameters('Kind'), 'Storage'), json('null'), parameters('AccessTier')), json('null'))]"
             }
         }
     ]
