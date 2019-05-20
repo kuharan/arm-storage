@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Name": {
+            "type": "string"
+        },
+		"Performance": {
+			"type": "string",
+			"defaultValue": "Premium",
+			"allowedValues": [
+				"Premium"
+			]
+		},
+		"Kind": {
+            "type": "string",
+            "defaultValue": "Storage",
+            "allowedValues": [
+                "Storage",
+                "StorageV2",
+				"BlockBlobStorage",
+				"FileStorage"
+            ]
+        },
+        "Replication": {
+            "type": "string",
+            "defaultValue": "Locally Redundant Storage (LRS)",
+            "allowedValues": [
+                "Locally Redundant Storage (LRS)"
+            ]
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('Name')]",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-07-01",
+            "sku": {
+                "name": "['Premium_LRS']"
+            },
+            "kind": "[parameters('Kind')]"
+        }
+    ]
+}

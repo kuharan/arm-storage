@@ -9,8 +9,7 @@
 			"type": "string",
 			"defaultValue": "Standard",
 			"allowedValues": [
-				"Standard",
-				"Premium"
+				"Standard"
 			]
 		},
 		"Kind": {
@@ -19,19 +18,17 @@
             "allowedValues": [
                 "Storage",
                 "StorageV2",
-                "BlobStorage",
-				"BlockBlobStorage",
-				"FileStorage"
+                "BlobStorage"
             ]
         },
         "Replication": {
             "type": "string",
-            "defaultValue": "Locally-redundant storage (LRS)",
+            "defaultValue": "Locally Redundant Storage (LRS)",
             "allowedValues": [
-                "Locally-redundant storage (LRS)",
-                "Zone-redundant storage (ZRS)",
-                "Geo-redundant storage (GRS)",
-                "Read-access geo-redundant storage (RA-GRS)"
+                "Locally Redundant Storage (LRS)",
+                "Geo Redundant Storage (GRS)",
+                "Zone Redundant Storage (ZRS)",
+                "Read Access Geo Redundant Storage (RA-GRS)"
             ]
         },
         "AccessTier": {
@@ -53,11 +50,11 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-07-01",
             "sku": {
-                "name": "[if(equals(parameters('Performance'), 'Standard'), if(or(equals(parameters('Kind'),'Storage'), equals(parameters('Kind'),'BlobStorage'), equals(parameters('Kind'), 'BlockBlobStorage'), equals(parameters('Kind'),'FileStorage')), if(equals(variables('Type'), 'Standard_ZRS'), 'Standard_LRS', variables('Type')), variables('Type')), 'Premium_LRS')]"
+                "name": "[if(or(equals(parameters('Kind'),'Storage'), equals(parameters('Kind'),'BlobStorage')), if(equals(variables('Type'), 'Standard_ZRS'), 'Standard_LRS', variables('Type')), variables('Type'))]"
             },
-            "kind": "[if(equals(parameters('Performance'), 'Standard'), if(or(equals(parameters('Kind'), 'BlockBlobStorage'), equals(parameters('Kind'), 'FileStorage')), 'BlobStorage', parameters('Kind')), if(equals(parameters('Kind'),'BlobStorage'), 'BlockBlobStorage' , parameters('Kind')))]",
+            "kind": "[parameters('Kind')]",
             "properties": {
-                "accessTier": "[if(equals(parameters('Performance'), 'Standard'), if(equals(parameters('Kind'), 'Storage'), json('null'), parameters('AccessTier')), json('null'))]"
+                "accessTier": "[if(equals(parameters('Kind'), 'Storage'), json('null'), parameters('AccessTier'))]"
             }
         }
     ]
